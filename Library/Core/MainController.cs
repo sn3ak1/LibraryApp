@@ -31,14 +31,14 @@ namespace Library.Core
             b.UserRenting = u;
             b.RentingDate = DateTime.Today;
 
-            // context.UserHistoryBooks.Add(new User_History_book()
-            // {
-            //     User = u, HistoryBook = new HistoryBook()
-            //         {
-            //             Title = book.Title, Author = book.Author, Genre = book.Genre, Currency = book.Currency,
-            //             Price = book.Price, PageCount = book.PageCount
-            //         }
-            // });
+            context.UserHistoryBooks.Add(new User_History_book()
+            {
+                UserId = u.Id, HistoryBook = new HistoryBook()
+                    {
+                        Title = book.Title, Author = book.Author, Genre = book.Genre, Currency = book.Currency,
+                        Price = book.Price, PageCount = book.PageCount
+                    }
+            });
 
             // UserController.LoggedAs.RentingHistory.Add(book);
             // context.Users.Update(UserController.LoggedAs);
@@ -85,7 +85,7 @@ namespace Library.Core
         {
             using var context = new Context();
             return context.UserHistoryBooks
-                .Where(x => x.User.Id == user.Id)
+                .Where(x => x.UserId == user.Id)
                 .Select(x => x.HistoryBook).ToArray();
         }
     }

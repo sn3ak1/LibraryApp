@@ -59,12 +59,13 @@ namespace Library.Data
         public Genre Genre { get; set; }
         public int PageCount { get; set; }
         public Currency Currency { get; set; }
+        public DateTime RentedDate { get; set; }
     }
 
     public class User_History_book
     {
         public int Id { get; set; }
-        public User User { get; set; }
+        public int UserId { get; set; }
         public HistoryBook HistoryBook { get; set; }
     }
 }
