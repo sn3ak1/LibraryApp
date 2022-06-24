@@ -20,10 +20,6 @@ namespace Library.Core
             if(UserController.LoggedAs.RentedBooks.Count>=3 || book.UserRenting!=null) return false;
             
             using var context = new Context();
-            // context.Attach(book);
-            // book.UserRenting = UserController.LoggedAs;
-            // book.RentingDate = DateTime.Today;
-            //
 
             var u = UserController.LoggedAs;
             
@@ -36,13 +32,10 @@ namespace Library.Core
                 UserId = u.Id, HistoryBook = new HistoryBook()
                     {
                         Title = book.Title, Author = book.Author, Genre = book.Genre, Currency = book.Currency,
-                        Price = book.Price, PageCount = book.PageCount
+                        Price = book.Price, PageCount = book.PageCount, RentedDate = DateTime.Today
                     }
             });
 
-            // UserController.LoggedAs.RentingHistory.Add(book);
-            // context.Users.Update(UserController.LoggedAs);
-            // context.Books.Update(book);
             context.SaveChanges();
             return true;
         }

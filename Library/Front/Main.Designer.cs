@@ -104,7 +104,6 @@ namespace Library
             this.button1.TabIndex = 8;
             this.button1.Text = "Add";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // textBox3
             // 

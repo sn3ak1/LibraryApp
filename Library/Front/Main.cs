@@ -9,48 +9,30 @@ namespace Library
 {
     public partial class Main : Form
     {
-        private BindingList<Book> _books;
-
         public Main(bool rented = false, bool history = false)
         {
             InitializeComponent();
 
-            if (UserController.LoggedAs?.IsAdmin ?? false)
+            if (history)
             {
-                _books = new BindingList<Book>(MainController.GetBooks());
-                panel1.Visible = true;
-                dataGridView1.Top += panel1.Height;
-                _books.AllowEdit = true;
-
-                var update = new ToolStripMenuItem("Update");
-                update.Click += (sender, args) =>
-                {
-                    MainController.EditBook((Book) dataGridView1.CurrentRow!.DataBoundItem);
-
-                };
-                contextMenuStrip1.Items.Add(update);
-                
-                var delete = new ToolStripMenuItem("Delete");
-                delete.Click += ((sender, args) =>
-                {
-                    MainController.DeleteBook((Book) dataGridView1.CurrentRow!.DataBoundItem);
-                    deleteFromDataGrid();
-                });
-                contextMenuStrip1.Items.Add(delete);
-                comboBox1.DataSource = Enum.GetValues(typeof(Genre));
-                comboBox2.DataSource = Enum.GetValues(typeof(Currency));
+                var books = new BindingList<HistoryBook>(MainController.GetUserHistory(UserController.LoggedAs));
+                books.AllowNew = false;
+                dataGridView1.DataSource = books;
+                dataGridView1.Columns["Id"]!.Visible = false;
+                dataGridView1.MouseDown += MyDataGridView_MouseDown;
             }
             else if(rented)
             {
-                _books = new BindingList<Book>(UserController.LoggedAs!.RentedBooks.ToList());
-                _books.AllowEdit = false;
+                var books = new BindingList<Book>(UserController.LoggedAs.RentedBooks.ToList());
+
+                books.AllowEdit = false;
                 var prolong = new ToolStripMenuItem("Prolong");
                 prolong.Click += (sender, args) =>
                 {
-                    _books.AllowEdit = true;
+                    books.AllowEdit = true;
                     var book = (Book) dataGridView1.CurrentRow!.DataBoundItem;
                     book.RentingDate = DateTime.Today;
-                    _books.AllowEdit = false;
+                    books.AllowEdit = false;
                     MainController.EditBook(book);
 
                 };
@@ -63,42 +45,81 @@ namespace Library
                     deleteFromDataGrid();
                 };
                 contextMenuStrip1.Items.Add(returnBook);
-            }
-            else if(history)
-            {
-                // var hist = 
-                // _books = new BindingList<Book>(UserController.LoggedAs!.RentingHistory.ToList());
-                // _books.AllowEdit = false;
-            }
-            else if(UserController.LoggedAs!=null)
-            {
-                _books = new BindingList<Book>(MainController.GetBooks());
-                _books.AllowEdit = false;
-                var rentBook = new ToolStripMenuItem("Rent book");
-                rentBook.Click += (sender, args) =>
-                {
-                    if (!MainController.RentBook((Book) dataGridView1.CurrentRow!.DataBoundItem))
-                        MessageBox.Show("Renting failed");
-                    else
-                    {
-                        _books.AllowEdit = true;
-                        ((Book) dataGridView1.CurrentRow!.DataBoundItem).UserRenting = UserController.LoggedAs;
-                        _books.AllowEdit = false;
-
-                    }
-                };
-                contextMenuStrip1.Items.Add(rentBook);
+                
+                books.AllowNew = false;
+                dataGridView1.DataSource = books;
+                dataGridView1.Columns["Id"]!.Visible = false;
+                dataGridView1.MouseDown += MyDataGridView_MouseDown;
             }
             else
             {
-                _books = new BindingList<Book>(MainController.GetBooks());
-                _books.AllowEdit = false;
+                var books = new BindingList<Book>(MainController.GetBooks());
+                
+                if (UserController.LoggedAs?.IsAdmin ?? false)
+                {
+                    panel1.Visible = true;
+                    dataGridView1.Top += panel1.Height;
+                    books.AllowEdit = true;
+
+                    button1.Click += (sender, args) =>
+                    {
+                        var book = new Book()
+                        {
+                            Title = textBox1.Text, Author = textBox2.Text, Price = Convert.ToInt32(textBox3.Text),
+                            Genre = (Genre) comboBox1.SelectedItem, Currency = (Currency) comboBox2.SelectedItem
+                        };
+                        books.AllowNew = true;
+                        books.Add(book);
+                        books.AllowNew = false;
+                        MainController.AddBook(book);
+                    };
+
+                    var update = new ToolStripMenuItem("Update");
+                    update.Click += (sender, args) =>
+                    {
+                        MainController.EditBook((Book) dataGridView1.CurrentRow!.DataBoundItem);
+
+                    };
+                    contextMenuStrip1.Items.Add(update);
+                
+                    var delete = new ToolStripMenuItem("Delete");
+                    delete.Click += ((sender, args) =>
+                    {
+                        MainController.DeleteBook((Book) dataGridView1.CurrentRow!.DataBoundItem);
+                        deleteFromDataGrid();
+                    });
+                    contextMenuStrip1.Items.Add(delete);
+                    comboBox1.DataSource = Enum.GetValues(typeof(Genre));
+                    comboBox2.DataSource = Enum.GetValues(typeof(Currency));
+                }
+                else if(UserController.LoggedAs!=null)
+                {
+                    books.AllowEdit = false;
+                    var rentBook = new ToolStripMenuItem("Rent book");
+                    rentBook.Click += (sender, args) =>
+                    {
+                        if (!MainController.RentBook((Book) dataGridView1.CurrentRow!.DataBoundItem))
+                            MessageBox.Show("Renting failed");
+                        else
+                        {
+                            books.AllowEdit = true;
+                            ((Book) dataGridView1.CurrentRow!.DataBoundItem).UserRenting = UserController.LoggedAs;
+                            books.AllowEdit = false;
+
+                        }
+                    };
+                    contextMenuStrip1.Items.Add(rentBook);
+                }
+                else
+                {
+                    books.AllowEdit = false;
+                }
+                
+                books.AllowNew = false;
+                dataGridView1.DataSource = books;
+                dataGridView1.Columns["Id"]!.Visible = false;
+                dataGridView1.MouseDown += MyDataGridView_MouseDown;
             }
-            
-            _books.AllowNew = false;
-            dataGridView1.DataSource = _books;
-            dataGridView1.Columns["Id"]!.Visible = false;
-            dataGridView1.MouseDown += MyDataGridView_MouseDown;
         }
         
         private void MyDataGridView_MouseDown(object sender, MouseEventArgs e)
@@ -114,19 +135,7 @@ namespace Library
             }
             catch (Exception exception) { }
         }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            var book = new Book()
-            {
-                Title = textBox1.Text, Author = textBox2.Text, Price = Convert.ToInt32(textBox3.Text),
-                Genre = (Genre) comboBox1.SelectedItem, Currency = (Currency) comboBox2.SelectedItem
-            };
-            _books.AllowNew = true;
-            _books.Add(book);
-            _books.AllowNew = false;
-            MainController.AddBook(book);
-        }
+        
 
         private void deleteFromDataGrid()
         {
