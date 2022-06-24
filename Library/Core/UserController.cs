@@ -21,7 +21,6 @@ namespace Library.Core
                 return context.Users
                     .Include(x=>x.RentedBooks)
                     // .Include(x=>x.RentingHistory).AsNoTracking()
-                    .Include(x=>x.WatchList)
                     .FirstOrDefault(x=>x.Id == _loggedAs.Id);
             }
             set => _loggedAs = value;
@@ -74,7 +73,6 @@ namespace Library.Core
             return context.Users
                 .Include(x=>x.RentedBooks)
                 // .Include(x=>x.RentingHistory)
-                .Include(x=>x.WatchList)
                 .ToArray();
         }
 

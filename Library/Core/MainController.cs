@@ -81,5 +81,17 @@ namespace Library.Core
                 .Where(x => x.UserId == user.Id)
                 .Select(x => x.HistoryBook).ToArray();
         }
+
+        public static void AddToWatchlist(Book book)
+        {
+            var u = UserController.LoggedAs;
+            using var context = new Context();
+            if(context.WatchLists
+                   .Where(x=>x.UserId==u.Id)
+                   .FirstOrDefault(x=>x.Book.Id==book.Id)!=null) return;
+            context.Attach(book);
+            context.WatchLists.Add(new WatchList(){UserId = u.Id, Book = book});
+            context.SaveChanges();
+        }
     }
 }

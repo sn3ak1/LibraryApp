@@ -1,5 +1,6 @@
 ﻿using System.Windows.Forms;
 using Library.Core;
+using Library.Data;
 
 namespace Library
 {
@@ -21,7 +22,12 @@ namespace Library
         private void button2_Click(object sender, System.EventArgs e)
         {
             if(UserController.Login(textBox1.Text, textBox2.Text))
+            {
                 label1.Text = UserController.LoggedAs.Login;
+                var watchList = WatchListController.CheckWatchList();
+                if (watchList != null)
+                    MessageBox.Show(watchList);
+            }
         }
 
         private void button3_Click(object sender, System.EventArgs e)

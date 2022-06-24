@@ -41,8 +41,8 @@ namespace Library.Data
         public string SurName { get; set; }
         public ICollection<Book> RentedBooks { get; set;}
         public bool IsAdmin { get; set; }
+        
         public Genre WatchedGenre { get; set; }
-        public ICollection<Book> WatchList { get; set; }
 
         public override string ToString()
         {
@@ -67,5 +67,12 @@ namespace Library.Data
         public int Id { get; set; }
         public int UserId { get; set; }
         public HistoryBook HistoryBook { get; set; }
+    }
+
+    public class WatchList
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public Book Book { get; set; }
     }
 }

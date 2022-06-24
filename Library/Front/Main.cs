@@ -42,7 +42,7 @@ namespace Library
                 returnBook.Click += (sender, args) =>
                 {
                     MainController.ReturnBook((Book) dataGridView1.CurrentRow!.DataBoundItem);
-                    deleteFromDataGrid();
+                    DeleteFromDataGrid();
                 };
                 contextMenuStrip1.Items.Add(returnBook);
                 
@@ -86,7 +86,7 @@ namespace Library
                     delete.Click += ((sender, args) =>
                     {
                         MainController.DeleteBook((Book) dataGridView1.CurrentRow!.DataBoundItem);
-                        deleteFromDataGrid();
+                        DeleteFromDataGrid();
                     });
                     contextMenuStrip1.Items.Add(delete);
                     comboBox1.DataSource = Enum.GetValues(typeof(Genre));
@@ -109,6 +109,13 @@ namespace Library
                         }
                     };
                     contextMenuStrip1.Items.Add(rentBook);
+                    
+                    var addToWatchList = new ToolStripMenuItem("Add to watchlist");
+                    addToWatchList.Click += (sender, args) =>
+                    {
+                        MainController.AddToWatchlist((Book) dataGridView1.CurrentRow!.DataBoundItem);
+                    };
+                    contextMenuStrip1.Items.Add(addToWatchList);
                 }
                 else
                 {
@@ -137,7 +144,7 @@ namespace Library
         }
         
 
-        private void deleteFromDataGrid()
+        private void DeleteFromDataGrid()
         {
             Int32 rowToDelete = dataGridView1.Rows.GetFirstRow(DataGridViewElementStates.Selected);
             dataGridView1.Rows.RemoveAt(rowToDelete);
